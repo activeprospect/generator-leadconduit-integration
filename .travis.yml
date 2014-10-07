@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+  - '0.10'
+before_install:
+  - currentfolder=${PWD##*/}
+  - if [ "$currentfolder" != 'generator-leadconduit-integration' ]; then cd .. && eval "mv $currentfolder generator-leadconduit-integration" && cd generator-leadconduit-integration; fi
+

@@ -1,0 +1,28 @@
+{
+  "name": "<%= packageName %>",
+  "version": "0.0.0",
+  "main": "index.js",
+  "licenses": [{
+    "type": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International",
+    "url": "http://creativecommons.org/licenses/by-nc-nd/4.0/legalcode"
+  }],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=0.10.31"
+  },
+  "scripts": {
+    "test": "cake test",
+    "prepublish": "cake build"
+  },
+  "dependencies": {<% require('underscore').uniq(Object.keys(integration.src.dependencies).concat(Object.keys(integration.spec.dependencies))).filter(function(name) { return integration.src.dependencies[name] !== null || integration.spec.dependencies[name] !== null; }).map(function(name, index, arr) { %>
+    "<%= name %>": "<%= integration.src.dependencies[name] || integration.spec.dependencies[name] %>"<% if (arr.length > index + 1) { %>,<% } %><% }) %>
+  },
+  "devDependencies": {
+    "coffee-script": ">= 1.8.0",
+    "mocha": ">= 1.21.0",
+    "chai": ">= 1.9.1"
+  }
+}

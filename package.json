@@ -1,0 +1,43 @@
+{
+  "name": "generator-leadconduit-integration",
+  "version": "0.0.0",
+  "description": "Yeoman generator for LeadConduit Integrations",
+  "license": "MIT",
+  "main": "app/index.js",
+  "repository": "alexkwolfe/generator-leadconduit-integration",
+  "author": {
+    "email": "dev@activeprospect.com",
+    "url": "https://github.com/activeprospect"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "app"
+  ],
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^0.17.0",
+    "chalk": "^0.5.0",
+    "yosay": "^0.3.0",
+    "underscore.string": "^2.3.3",
+    "underscore": "^1.7.0",
+    "leadconduit-fields": "^1.0.2",
+    "npm": "^2.1.2",
+    "async": "^0.9.0",
+    "faker": "^2.0.1",
+    "xmlbuilder": "^2.4.4",
+    "rimraf": "^2.2.8"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "peerDependencies": {
+    "yo": ">=1.0.0"
+  }
+}
