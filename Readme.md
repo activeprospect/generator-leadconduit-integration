@@ -1,8 +1,4 @@
-LeadConduit Integration Generator
-
-[![Build Status](https://secure.travis-ci.org/alexkwolfe/generator-leadconduit-integration.png?branch=master)](https://travis-ci.org/alexkwolfe/generator-leadconduit-integration)
-
-
+## LeadConduit Integration Generator
 
 ### What is this?
 
@@ -39,7 +35,7 @@ Once those steps are done, you're ready to generate a new LeadConduit integratio
 
 We strongly recommend creating a public GitHub repository for your new integration before you run the generator. Doing this
 step now is optional, but you'll need to do it eventually and it makes the generator a little smarter. Follow the
-[online instructions]((https://help.github.com/articles/creating-a-new-repository/) before you generate your integration.
+[online instructions](https://help.github.com/articles/creating-a-new-repository/) before you generate your integration.
 
 
 
