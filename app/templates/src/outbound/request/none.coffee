@@ -1,6 +1,9 @@
 request = (vars) ->
 
-  lead = {}
+  lead = {}<% if (auth == 'key') {%>
+
+  # Set the API key
+  lead.apikey = vars.<%=serviceKey%>?.apikey<% } %>
 
   # Prepare the lead data for submission by using the toString() function on each value. This ensures that
   # complex data types such as phone numbers or postal codes are provided to the service in a normalized format.
@@ -29,3 +32,4 @@ request = (vars) ->
   method: '<%= request.method %>'
   headers:
     Accept: '<%= response.contentType %>'
+    <% if (auth == 'basic') { %>'Authorization': "Basic #{new Buffer("#{vars.<%=serviceKey%>?.username}:#{vars.<%=serviceKey%>?.password}").toString('base64')}"<% } %>

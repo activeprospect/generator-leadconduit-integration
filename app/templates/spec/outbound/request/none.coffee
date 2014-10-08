@@ -1,10 +1,18 @@
 <%
 var url = require('url');
 var querystring = require('querystring');
+
+// include the lead data
 var expectedQuery = {};
-for (key in normalizedVars) {
-  expectedQuery[key] = normalizedVars[key] != null ? normalizedVars[key].toString() : void 0;
+for (key in normalizedVars.lead) {
+  expectedQuery[key] = normalizedVars.lead[key] != null ? normalizedVars.lead[key].toString() : void 0;
 }
+
+if (auth == 'key') {
+  expectedQuery.apikey  = vars[serviceKey].apikey;
+}
+
+// encode the query string
 expectedQuery = querystring.encode(expectedQuery);
 var expectedUrl = url.parse(request.url);
 expectedUrl.search = expectedQuery;

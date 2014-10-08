@@ -6,6 +6,7 @@ var string = require('underscore.string');
 var yeoman = require('yeoman-generator');
 var yosay = require('yosay');
 var async = require('async');
+var faker = require('faker');
 var rimraf = require('rimraf');
 var shell = require('shelljs');
 var fields = require('leadconduit-fields');
@@ -55,7 +56,7 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
     ];
     this.prompt(prompts, function (answers) {
       if (answers.continue !== undefined && !answers.continue) {
-        this.log("For help, see https://help.github.com/articles/create-a-repo/.");
+        self.log("For help, see https://help.github.com/articles/create-a-repo/.");
         process.exit(1);
       }
 
@@ -98,6 +99,18 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
             'POST', 'GET', 'PUT', 'DELETE', 'HEAD'
           ],
           default: 'POST',
+          when: isOutbound
+        },
+        {
+          type: 'list',
+          name: 'auth',
+          message: 'Does the service require authentication?',
+          choices: [
+            { name: 'No or not sure', value: 'none' },
+            { name: 'Yes, using Basic Auth', value: 'basic' },
+            { name: 'Yes, with an API key', value: 'key' }
+          ],
+          default: 'none',
           when: isOutbound
         },
         {
@@ -152,7 +165,7 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
         {
           type: 'checkbox',
           name: 'fields',
-          message: 'What of these basic fields should be sent to the service?',
+          message: 'Which of these basic fields should be sent to the service?',
           choices: fieldOptions.map(function(id) {
             var field = _.findWhere(fields, { id: id });
             return { name: field.name, value: field };
@@ -161,89 +174,10 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
         }
       ];
 
-      this.prompt(prompts, function (answers) {
-        this.require = require;
-        this.name = answers.name;
-        this.serviceKey = string.underscored(this.name.toLowerCase().replace(/[^0-9a-z _]/g, ''));
-        this.packageName = 'leadconduit-' + this.serviceKey;
-        this.repoName = 'leadconduit-integration-' + this.serviceKey;
-        this.type = answers.type;
-        this.fields = answers.fields;
-        this.vars = vars(answers.fields);
-        this.normalizedVars = require('leadconduit-fields').buildLeadVars(this.vars);
-
-        var githubRepoUrl = shell.exec('git remote -v', { silent: true }).output.split('\t')[1];
-        this.githubUser = null;
-        this.githubRepo = null;
-        if (githubRepoUrl) {
-          var match = githubRepoUrl.match(/git@github.com:([^/]+)\/([a-z0-9-_.]+).git/i);
-          this.githubUser = match[1];
-          this.githubRepo = match[2];
-        }
-
-        if (this.type == 'outbound') {
-          this.request = {
-            url: answers.url,
-            method: answers.method,
-            hasBody: answers.method === 'POST' || answers.method === 'PUT',
-            contentType: answers.requestContentType
-          };
-          this.response = {
-            contentType: answers.responseContentType
-          };
-          if (answers.successString)
-            this.successString = answers.successString.toLowerCase();
-          if (answers.failureString)
-            this.failureString = answers.failureString.toLowerCase();
-        }
-
-        var self = this;
-
-        var resolveDependencies = function(dir, callback) {
-          var requestFile = templateName(self.request.contentType);
-          var responseFile = templateName(self.response.contentType);
-          var requirements = [ requestFile, responseFile ];
-          var indent = 0;
-          if (dir === 'spec') { indent = 4 }
-          var depNames = _.uniq(_.flatten(requirements.map(function (file) {
-            return require(path.join(self.sourceRoot(), dir, self.type, 'requires', file + '.js'));
-          })));
-          deps(depNames, function(err, dependencies) {
-            if (err) return callback(err);
-            self.integration = self.integration || {};
-            self.integration[dir] = {};
-            self.integration[dir].dependencies = dependencies;
-            self.integration[dir].requires = cleanUp(_.template(self.read(path.join(dir, 'requires.coffee')))(self));
-            self.integration[dir].request = cleanUp(_.template(self.read(path.join(dir, self.type, 'request', requestFile + '.coffee')))(self), indent);
-            self.integration[dir].response = cleanUp(_.template(self.read(path.join(dir, self.type, 'response', responseFile + '.coffee')))(self), indent);
-            callback();
-          });
-        };
-
-        var cleanUp = function(content, indent) {
-          var lines = content.split('\n');
-          while(lines[0] && lines[0].trim() === '') {
-            lines.shift();
-          }
-          while(lines[lines.length - 1] && lines[lines.length - 1].trim() === '') {
-            lines.pop();
-          }
-          if (indent == null || indent == undefined)
-            indent = -1;
-          var indentation = Array(indent + 1).join(' ');
-          return indentation + lines.join('\n' + indentation);
-        };
-
-        var dirs = ['src', 'spec'];
-        async.each(dirs, resolveDependencies, function(err) {
-          if (err) {
-            console.error(err);
-            process.exit(1);
-          }
-          done()
-        });
-      }.bind(this));
-    }.bind(this));
+      self.prompt(prompts, function (answers) {
+        self._processAnswers(answers, done);
+      });
+    });
 
   },
 
@@ -268,6 +202,101 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
 
   end: function () {
     this.npmInstall();
+  },
+  
+  _processAnswers: function(answers, done) {
+    this.require = require;
+    this.name = answers.name;
+    this.serviceKey = string.underscored(this.name.toLowerCase().replace(/[^0-9a-z _]/g, ''));
+    this.packageName = 'leadconduit-' + this.serviceKey;
+    this.repoName = 'leadconduit-integration-' + this.serviceKey;
+    this.type = answers.type;
+    this.auth = answers.auth;
+    this.fields = answers.fields;
+    this.vars = vars(answers.fields);
+    switch (this.auth) {
+      case 'key':
+        this.vars[this.serviceKey] = vars[this.serviceKey] || {};
+        this.vars[this.serviceKey].apikey = faker.internet.password();
+        break;
+      case 'basic':
+        this.vars[this.serviceKey] = vars[this.serviceKey] || {};
+        var username = this.vars[this.serviceKey].username = faker.internet.userName();
+        var password = this.vars[this.serviceKey].password = faker.internet.password();
+        this.basicAuthHeader = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+        break;
+    }
+    this.normalizedVars = { lead: require('leadconduit-fields').buildLeadVars(this.vars.lead) };
+    var githubRepoUrl = shell.exec('git remote -v', { silent: true }).output.split('\t')[1];
+    this.githubUser = null;
+    this.githubRepo = null;
+    if (githubRepoUrl) {
+      var match = githubRepoUrl.match(/git@github.com:([^/]+)\/([a-z0-9-_.]+).git/i);
+      this.githubUser = match[1];
+      this.githubRepo = match[2];
+    }
+
+    if (this.type == 'outbound') {
+      this.request = {
+        url: answers.url,
+        method: answers.method,
+        hasBody: answers.method === 'POST' || answers.method === 'PUT',
+        contentType: answers.requestContentType
+      };
+      this.response = {
+        contentType: answers.responseContentType
+      };
+      if (answers.successString)
+        this.successString = answers.successString.toLowerCase();
+      if (answers.failureString)
+        this.failureString = answers.failureString.toLowerCase();
+    }
+
+    var self = this;
+
+    var resolveDependencies = function(dir, callback) {
+      var requestFile = templateName(self.request.contentType);
+      var responseFile = templateName(self.response.contentType);
+      var requirements = [ requestFile, responseFile ];
+      var indent = 0;
+      if (dir === 'spec') { indent = 4 }
+      var depNames = _.uniq(_.flatten(requirements.map(function (file) {
+        return require(path.join(self.sourceRoot(), dir, self.type, 'requires', file + '.js'));
+      })));
+      deps(depNames, function(err, dependencies) {
+        if (err) return callback(err);
+        self.integration = self.integration || {};
+        self.integration[dir] = {};
+        self.integration[dir].dependencies = dependencies;
+        self.integration[dir].requires = cleanUp(_.template(self.read(path.join(dir, 'requires.coffee')))(self));
+        self.integration[dir].request = cleanUp(_.template(self.read(path.join(dir, self.type, 'request', requestFile + '.coffee')))(self), indent);
+        self.integration[dir].response = cleanUp(_.template(self.read(path.join(dir, self.type, 'response', responseFile + '.coffee')))(self), indent);
+        callback();
+      });
+    };
+
+    var cleanUp = function(content, indent) {
+      var lines = content.split('\n');
+      while(lines[0] && lines[0].trim() === '') {
+        lines.shift();
+      }
+      while(lines[lines.length - 1] && lines[lines.length - 1].trim() === '') {
+        lines.pop();
+      }
+      if (indent == null || indent == undefined)
+        indent = -1;
+      var indentation = Array(indent + 1).join(' ');
+      return indentation + lines.join('\n' + indentation);
+    };
+
+    var dirs = ['src', 'spec'];
+    async.each(dirs, resolveDependencies, function(err) {
+      if (err) {
+        console.error(err);
+        process.exit(1);
+      }
+      done()
+    });
   },
 
   _removeDir: function(dir) {

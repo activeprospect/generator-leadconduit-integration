@@ -1,3 +1,15 @@
+<%
+var url = request.url;
+if (auth == 'key') {
+  if (url.indexOf('?') == -1) {
+    url = url + '?';
+  }
+  url = url + 'apikey=#{vars.' + serviceKey + '?.apikey}'
+  url = '"' + url + '"';
+} else {
+  url = "'" + url + "'";
+}
+%>
 request = (vars) ->
 
   lead = {}
@@ -11,10 +23,11 @@ request = (vars) ->
   body = JSON.stringify(lead, null, 2)
 
   # Return the request
-  url:    '<%= request.url %>'
+  url:    <%= url %>
   method: '<%= request.method %>'
   headers:
     'Accept':         '<%= response.contentType %>'
     'Content-Type':   '<%= request.contentType %>'
-    'Content-Length': body.length
+    'Content-Length': body.length<% if (auth == 'basic') { %>
+    'Authorization':  "Basic #{new Buffer("#{vars.<%=serviceKey%>?.username}:#{vars.<%=serviceKey%>?.password}").toString('base64')}"<% } %>
   body: body

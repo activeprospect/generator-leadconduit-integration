@@ -8,13 +8,12 @@ describe 'Outbound', ->
   describe 'request', ->
 
     beforeEach ->
-      @vars =
-        lead: fields.buildLeadVars <% Object.keys(vars).forEach(function(name) { %>
-          <%= name %>: '<%= vars[name] %>' <% }) %>
-  <% if (request.contentType) { %>
-    it 'should have correct URL', ->
-      assert.equal outbound.request(@vars).url, '<%= request.url %>'
-  <% } %>
+      @vars = <% Object.keys(vars).filter(function(name) { return name !== 'lead' }).forEach(function(key) { %>
+        <%= key %>: <% Object.keys(vars[key]).forEach(function(name) {%>
+          <%= name %>: '<%= vars[key][name] %>' <% })}) %>
+        lead: fields.buildLeadVars <% Object.keys(vars.lead).forEach(function(name) { %>
+          <%= name %>: '<%= vars.lead[name] %>' <% }) %>
+
     it 'should be a <%= request.method %>', ->
       assert.equal outbound.request(@vars).method, '<%= request.method %>'
 
@@ -27,6 +26,9 @@ describe 'Outbound', ->
     it 'should have content length header that matches body length', ->
       req = outbound.request(@vars)
       assert.equal req.headers['Content-Length'], req.body.length
+  <% } %><% if (auth == 'basic') {%>
+    it 'should have basic auth header', ->
+      assert.equal outbound.request(@vars).headers['Authorization'], '<%= basicAuthHeader %>'
   <% } %><%= integration.spec.request %>
 
 
@@ -42,9 +44,11 @@ describe 'Outbound', ->
   describe 'response', ->
 
     beforeEach ->
-      @vars =
-        lead: fields.buildLeadVars <% Object.keys(vars).forEach(function(name) { %>
-          <%= name %>: '<%= vars[name] %>' <% }) %>
+      @vars = <% Object.keys(vars).filter(function(name) { return name !== 'lead' }).forEach(function(key) { %>
+        <%= key %>: <% Object.keys(vars[key]).forEach(function(name) {%>
+          <%= name %>: '<%= vars[key][name] %>' <% })}) %>
+        lead: fields.buildLeadVars <% Object.keys(vars.lead).forEach(function(name) { %>
+          <%= name %>: '<%= vars.lead[name] %>' <% }) %>
       @req = outbound.request(@vars)
 
     it 'should parse success', ->

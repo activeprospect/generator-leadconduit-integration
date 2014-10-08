@@ -21,7 +21,11 @@
 # Returns an Array of variables objects, each with name, description and boolean required flag.
 #
 request.variables = ->
-  [ <% fields.map(function(field) { %>
+
+  [ <% if (auth == 'key') {%>
+    { name: '<%= serviceKey %>.apikey', type: 'string', description: '<%= name %> API key' }<% } %><% if (auth == 'basic') { %>
+    { name: '<%= serviceKey %>.username', type: 'string', description: '<%= name %> user name' }
+    { name: '<%= serviceKey %>.password', type: 'string', description: '<%= name %> password' }<% } %><% fields.map(function(field) { %>
     { name: 'lead.<%= field.id %>', type: '<%= field.type %>', description: '<%= field.description  %>' } <% }) %>
   ]
 

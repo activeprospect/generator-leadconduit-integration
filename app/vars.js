@@ -2,7 +2,7 @@ var faker = require('faker');
 
 module.exports = function(fields) {
   var vars = {};
-  return fields.reduce(function(vars, field) {
+  return { lead: fields.reduce(function(vars, field) {
     var id = field.id;
     switch (id) {
       case 'first_name':
@@ -39,5 +39,5 @@ module.exports = function(fields) {
         break;
     }
     return vars;
-  }, vars);
+  }, vars)};
 };
