@@ -1,8 +1,9 @@
 # LeadConduit <%= name %> Integration
 
 This module is for use on the LeadConduit platform. Please see the [license agreement](http://creativecommons.org/licenses/by-nc-nd/4.0/).
-
-[![Build Status](https://travis-ci.org/<%= repoName %>.png?branch=master)](https://travis-ci.org/<%= repoName %>/)
+<% if (githubUser && githubRepo) { %>
+[![Build Status](https://travis-ci.org/<%= githubUser %>/<%= githubRepo %>.png?branch=master)](https://travis-ci.org/<%= githubUser %>/<%= githubRepo %>/)
+[![Dependencies](https://david-dm.org/<%= githubUser %>/<%= githubRepo %>.png)](https://david-dm.org/<%= githubUser %>/<%= githubRepo %>/)<% } %>
 
 
 ### Installing dependencies
