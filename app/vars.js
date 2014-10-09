@@ -2,6 +2,7 @@ var faker = require('faker');
 
 module.exports = function(fields) {
   var vars = {};
+  if(typeof fields == 'undefined') return {lead:{}};
   return { lead: fields.reduce(function(vars, field) {
     var id = field.id;
     switch (id) {

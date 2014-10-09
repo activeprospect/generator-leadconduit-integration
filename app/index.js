@@ -34,10 +34,11 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
     var self = this;
     var done = this.async();
 
-    // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the LeadConduit Integration generator!'
-    ));
+    if (!this.options['skip-welcome-message']) {
+      this.log(yosay(
+        'Welcome to the LeadConduit Integration generator!'
+      ));
+    }
 
     var isOutbound = function (answers) {
       return answers.type.indexOf('outbound') !== -1;
@@ -88,7 +89,7 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
           type: 'input',
           name: 'url',
           message: 'What is the service\'s URL?',
-          default: 'http://mywebservice',
+          default: 'https://mywebservice.com',
           when: isOutbound
         },
         {
@@ -185,13 +186,13 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
     app: function () {
       this.dest.mkdir('src');
       this.dest.mkdir('spec');
-      this.template('package.json', 'package.json');
-      this.template('src/' + this.type + '.coffee', 'src/' + this.type + '.coffee');
-      this.template('spec/' + this.type + '-spec.coffee', 'spec/' + this.type + '-spec.coffee');
+      this.template('package.json');
+      this.template('src/' + this.type + '.coffee');
+      this.template('spec/' + this.type + '-spec.coffee');
     },
 
     projectfiles: function () {
-      this.template('Readme.md', 'Readme.md');
+      this.template('Readme.md');
       this.src.copy('Cakefile', 'Cakefile');
       this.src.copy('travis.yml', '.travis.yml');
       this.src.copy('gitignore', '.gitignore');
@@ -201,7 +202,9 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
   },
 
   end: function () {
-    this.npmInstall();
+    if (!this.options['skip-install']) {
+      this.npmInstall();
+    }
   },
   
   _processAnswers: function(answers, done) {
