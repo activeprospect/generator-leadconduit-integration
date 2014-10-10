@@ -94,7 +94,7 @@ Generally speaking there are three steps that must be taken to take your integra
 ### About integration versioning
 
 We use [Semantic Versioning](http://semver.org) and you should too. But if you don't know how, don't worry. We'll help
-ensure that your package version makes sense before we take include it on the platform or before we allow updates to your
+ensure that your package version makes sense before we include it on the platform or before we allow updates to your
 integration.
 
 
