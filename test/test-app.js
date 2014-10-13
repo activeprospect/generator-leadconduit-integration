@@ -12,22 +12,23 @@ describe('leadconduit:app', function () {
     this.app = require('../app');
   });
 
+  var options = {
+    'skip-install': true,
+    'skip-welcome-message': true
+  };
+
+  var prompts = {
+    continue: true,
+    fields: []
+  };
+
+  var runGen;
+
   describe('outbound', function () {
 
-    var options = {
-      'skip-install': true,
-      'skip-welcome-message': true
-    };
-
-    var prompts = {
-      continue: true,
-      type: 'outbound',
-      fields: []
-    };
-
-    var runGen;
-
     beforeEach(function () {
+      prompts.type = 'outbound';
+
       runGen = helpers
         .run(path.join(__dirname, '../app'))
         .inDir(path.join(__dirname, './temp-test'))
@@ -50,5 +51,36 @@ describe('leadconduit:app', function () {
         done();
       });
     });
+  });
+
+  describe('inbound', function () {
+
+    beforeEach(function () {
+      prompts.type = 'inbound';
+
+      runGen = helpers
+        .run(path.join(__dirname, '../app'))
+        .inDir(path.join(__dirname, './temp-test'))
+        .withPrompts(prompts)
+        .withGenerators([[helpers.createDummyGenerator(), 'mocha:app']]);
+    });
+
+    it('creates files', function (done) {
+      runGen.withOptions(options).on('end', function() {
+        assert.file([
+          '.gitignore',
+          '.npmignore',
+          '.travis.yml',
+          'Cakefile',
+          'Readme.md',
+          'package.json',
+          'spec/inbound-spec.coffee',
+          'src/inbound.coffee'
+        ]);
+
+        done();
+      });
+    });
+
   });
 });

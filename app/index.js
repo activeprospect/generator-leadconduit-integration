@@ -44,6 +44,10 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
       return answers.type.indexOf('outbound') !== -1;
     };
 
+    var isInbound = function (answers) {
+      return answers.type.indexOf('inbound') !== -1;
+    };
+
     var prompts = [
       {
         type: 'confirm',
@@ -172,7 +176,39 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
             return { name: field.name, value: field };
           }),
           when: isOutbound
+        },
+
+        // Inbound questions
+        {
+          type: 'list',
+          name: 'requestContentType',
+          message: 'What format (Content-Type) is the service sending?',
+          choices: [
+            { name: 'Standard Form POST (application/x-www-form-urlencoded)', value: 'application/x-www-form-urlencoded' },
+            { name: 'JSON (application/json)', value: 'application/json' },
+            { name: 'XML (text/xml)', value: 'text/xml' }
+          ],
+          default: 'application/x-www-form-urlencoded',
+          when: isInbound
+        },
+        {
+          type: 'list',
+          name: 'responseContentType',
+          message: 'What format (Content-Type) does the service expect LeadConduit to respond with?',
+          choices: [
+            { name: 'JSON (application/json)', value: 'application/json' },
+            { name: 'XML (text/xml)', value: 'text/xml' },
+            { name: 'Plain text (text/plain)', value: 'text/plain' }
+          ],
+          default: function (answers) {
+            if (answers.requestContentType === 'application/x-www-form-urlencoded')
+              return 'application/json';
+            else
+              return answers.requestContentType;
+          },
+          when: isInbound
         }
+
       ];
 
       self.prompt(prompts, function (answers) {
@@ -247,14 +283,21 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
         hasBody: answers.method === 'POST' || answers.method === 'PUT',
         contentType: answers.requestContentType
       };
-      this.response = {
-        contentType: answers.responseContentType
-      };
       if (answers.successString)
         this.successString = answers.successString.toLowerCase();
       if (answers.failureString)
         this.failureString = answers.failureString.toLowerCase();
     }
+    else {
+      // type is inbound
+      this.request = {}
+    }
+
+    // same for inbound & outbound
+    this.request.contentType = answers.requestContentType;
+    this.response = {
+      contentType: answers.responseContentType
+    };
 
     var self = this;
 
