@@ -235,8 +235,13 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
     this.githubRepo = null;
     if (githubRepoUrl) {
       var match = githubRepoUrl.match(/git@github.com:([^/]+)\/([a-z0-9-_.]+).git/i);
-      this.githubUser = match[1];
-      this.githubRepo = match[2];
+      if (match) {
+        this.githubUser = match[1];
+        this.githubRepo = match[2];
+      }
+      else {
+        console.log("No user/repo match in '" + githubRepoUrl + "'");
+      }
     }
 
     if (this.type == 'outbound') {
