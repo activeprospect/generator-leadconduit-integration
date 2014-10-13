@@ -1,5 +1,7 @@
 ## LeadConduit Integration Generator
 
+[![Build Status](https://travis-ci.org/activeprospect/generator-leadconduit-integration.svg?branch=master)](https://travis-ci.org/activeprospect/generator-leadconduit-integration)
+
 ### What is this?
 
 This tool is provided for developers who wish to create a new integration for the LeadConduit platform. After asking a few
