@@ -13,7 +13,7 @@ intended that the generated code be customized to account for the specifics of i
 ### Getting Started
 
 LeadConduit integrations are written in JavaScript or CoffeeScript on the Node.JS platform. You must have
-[Node.JS installed](http://node.js/download) in order to develop integrations or use this generator.
+[Node.JS installed](http://www.nodejs.org/) in order to develop integrations or use this generator.
 
 You must also have the [Yeoman](http://yeoman.io) tool and this generator installed:
 
