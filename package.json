@@ -4,7 +4,10 @@
   "description": "Yeoman generator for LeadConduit Integrations",
   "license": "MIT",
   "main": "app/index.js",
-  "repository": "alexkwolfe/generator-leadconduit-integration",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/activeprospect/generator-leadconduit-integration"
+  },
   "author": {
     "email": "dev@activeprospect.com",
     "url": "https://github.com/activeprospect"

@@ -53,7 +53,7 @@ describe('leadconduit:app', function () {
     });
   });
 
-  describe('inbound', function () {
+  xdescribe('inbound', function () {
 
     beforeEach(function () {
       prompts.type = 'inbound';

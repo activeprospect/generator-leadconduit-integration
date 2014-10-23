@@ -83,8 +83,8 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
           name: 'type',
           message: 'Select integration type:',
           choices: [
-            { name: 'Outbound (out of LeadConduit)', value: 'outbound' },
-            { name: 'Inbound (into LeadConduit)', value: 'inbound' }
+            { name: 'Outbound (out of LeadConduit)', value: 'outbound' } //,
+//            { name: 'Inbound (into LeadConduit)', value: 'inbound' }
           ]
         },
 
