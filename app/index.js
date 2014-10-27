@@ -12,7 +12,7 @@ var shell = require('shelljs');
 var fields = require('leadconduit-fields');
 var deps = require('./dependencies');
 var vars = require('./vars');
-
+var gitparse = require('./util');
 
 var templateName = function (contentType) {
   if (contentType !== null && contentType !== undefined)
@@ -270,10 +270,8 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
     this.githubUser = null;
     this.githubRepo = null;
     if (githubRepoUrl) {
-      // regex for either "git://github.com/(user)/(repo).git ..." or "git@github.com:(user)/(repo).git ..."
-      var match = githubRepoUrl.match(/git[@:]\/*github.com[:/]([^/]+)\/([a-z0-9-_.]+).git/i);
-      this.githubUser = match[1];
-      this.githubRepo = match[2];
+      this.githubUser = gitparse(githubRepoUrl)['user'];
+      this.githubRepo = gitparse(githubRepoUrl)['repo'];
     }
 
     if (this.type == 'outbound') {
