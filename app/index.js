@@ -306,7 +306,8 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
       var indent = 0;
       if (dir === 'spec') { indent = 4 }
       var depNames = _.uniq(_.flatten(requirements.map(function (file) {
-        return require(path.join(self.sourceRoot(), dir, self.type, 'requires', file + '.js'));
+        var essentialDeps = ['leadconduit-fields'];
+        return essentialDeps.concat(require(path.join(self.sourceRoot(), dir, self.type, 'requires', file + '.js')));
       })));
       deps(depNames, function(err, dependencies) {
         if (err) return callback(err);

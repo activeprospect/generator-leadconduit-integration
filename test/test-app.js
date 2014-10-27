@@ -52,6 +52,15 @@ describe('leadconduit:app', function () {
         done();
       });
     });
+
+    it('creates correct src file content', function (done) {
+      runGen.withOptions(options).on('end', function () {
+        assert.fileContent('package.json', /"leadconduit.fields":/);
+        done();
+      })
+    });
+
+
   });
 
   xdescribe('inbound', function () {
