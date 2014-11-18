@@ -5,6 +5,34 @@ outbound = require '../src/outbound'
 
 describe 'Outbound', ->
 
+  describe 'validation', ->
+    <% fields.forEach(function(field) { %>
+    describe 'of <%= field.id %>', ->
+
+      beforeEach ->
+        @vars = <% Object.keys(vars).filter(function(name) { return name !== 'lead' }).forEach(function(key) { %>
+          <%= key %>: <% Object.keys(vars[key]).forEach(function(name) {%>
+            <%= name %>: '<%= vars[key][name] %>' <% })}) %>
+          lead: fields.buildLeadVars <% Object.keys(vars.lead).filter(function(name){ return name !== field.id; }).forEach(function(name) { %>
+            <%= name %>: '<%= vars.lead[name] %>' <% }) %>
+
+      it 'should not allow null', ->
+        @vars.lead.<%= field.id %> = null
+        error = outbound.validate(@vars)
+        assert.equal error, 'lead.<%= field.id %> must not be blank'
+
+      it 'should not allow undefined', ->
+        error = outbound.validate(@vars)
+        assert.equal error, 'lead.<%= field.id %> must not be blank'
+
+      it 'should not allow empty', ->
+        @vars.lead.<%= field.id %> = ''
+        error = outbound.validate(@vars)
+        assert.equal error, 'lead.<%= field.id %> must not be blank'
+
+    <% }) %>
+
+
   describe 'request', ->
 
     beforeEach ->
