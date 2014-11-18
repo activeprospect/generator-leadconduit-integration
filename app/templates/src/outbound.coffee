@@ -30,6 +30,23 @@ request.variables = ->
   ]
 
 
+
+#
+# Validate Function ------------------------------------------------------
+#
+
+#
+# This optional function validates the variables that will be passed to the request() function.
+# If the validate function returns anything other than null or undefined, the integration will be
+# skipped. When a string is returned, it will be revealed to the user as the reason that
+# the skip occurred.
+#
+
+validate = (vars) -><% fields.forEach(function(field) { %>
+  return 'lead.<%= field.id %> must not be blank' if !vars.lead.<%= field.id %>? or vars.lead.<%= field.id %>.toString() == ''<% }) %>
+
+
+
 #
 # Response Function ------------------------------------------------------
 #
@@ -61,8 +78,10 @@ response.variables = ->
 #
 
 #
-# Your integration module must export the request and response function.
+# Your integration module must export the request and response function. The
+# validate function is optional.
 #
 module.exports =
+  validate: validate
   request: request
   response: response
