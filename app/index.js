@@ -230,6 +230,7 @@ var LeadConduitIntegrationGenerator = yeoman.generators.Base.extend({
     projectfiles: function () {
       this.template('Readme.md');
       this.src.copy('Cakefile', 'Cakefile');
+      this.src.copy('index.js', 'index.js');
       this.src.copy('travis.yml', '.travis.yml');
       this.src.copy('gitignore', '.gitignore');
       this.src.copy('npmignore', '.npmignore');

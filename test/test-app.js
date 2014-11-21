@@ -46,6 +46,7 @@ describe('leadconduit:app', function () {
           'Cakefile',
           'Readme.md',
           'package.json',
+          'index.js',
           'spec/outbound-spec.coffee',
           'src/outbound.coffee'
         ]);
