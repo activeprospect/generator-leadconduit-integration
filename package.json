@@ -1,6 +1,6 @@
 {
   "name": "generator-leadconduit-integration",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Yeoman generator for LeadConduit Integrations",
   "license": "MIT",
   "main": "app/index.js",
